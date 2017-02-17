@@ -1,0 +1,46 @@
+# private files #
+#################
+my_secrets.yml
+old_config.yml
+
+
+# flexget generated files and folders #
+#######################################
+.config-lock
+received
+trakt-movies
+trakt-movies.*
+trakt-series
+trakt-series.*
+cached_resources
+converted
+
+
+# all files to be ignored #
+###########################
+*.ignore
+
+
+# python files #
+################
+*.pyc
+
+
+# Logs and databases #
+######################
+*.log
+*.log.*
+*.sql
+*.sqlite
+*.sqlite.*
+
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
