@@ -1,4 +1,4 @@
-variables: secrets.yml
+variables: my_secrets.yml
 schedules:
   - tasks: ['populate-*', 'clean-*', 'update-*']
     schedule:
