@@ -72,6 +72,10 @@ templates:
 ##### Common rejections
 #
   reject:
+    trakt_lookup:
+      username: "{? trakt.user ?}"
+    if:
+      - trakt_watched: reject
     regexp:
       reject:
         - \b(s|d)ub(s|bed|lado|titulado)?\b
@@ -265,7 +269,7 @@ tasks:
       - transmission-series
       - pushbullet
     filesystem:
-      path: "/{? folder.root ?}{? folder.downseries ?}"
+      path: "/{? folder.watchseries ?}"
       mask: '*.torrent'
     accept_all: yes
     exec:
@@ -365,7 +369,7 @@ tasks:
       - transmission-movies
       - pushbullet
     filesystem:
-      path: "/{? folder.root ?}{? folder.downmovies ?}"
+      path: "/{? folder.watchmovies ?}"
       mask: '*.torrent'
     accept_all: yes
     exec:
@@ -469,7 +473,8 @@ tasks:
       - disable-seen-retry
       - series-metainfo
     filesystem:
-      path: "/{? folder.root ?}{? folder.downseries ?}"
+      path:
+        - "/{? folder.root ?}{? folder.downseries ?}"
       recursive: yes
       retrieve: files
       regexp: '.*\.(avi|mkv|mp4)$'
@@ -502,7 +507,8 @@ tasks:
       - disable-seen-retry
       - movies-metainfo
     filesystem:
-      path: "/{? folder.root ?}{? folder.downmovies ?}"
+      path:
+        - "/{? folder.root ?}{? folder.downmovies ?}"
       recursive: yes
       retrieve: files
       regexp: '.*\.(avi|mkv|mp4)$'
@@ -512,7 +518,7 @@ tasks:
         - \btrailer\b
         - \bsample\b
     move:
-      to: "/{? folder.root ?}{? folder.movies ?}"
+      to: "/{? folder.root ?}{? folder.movies ?}{{tmdb_name|pathscrub}} ({{tmdb_movie_year}})"
       rename: "{{tmdb_name|pathscrub}} ({{tmdb_year}}){% if quality|default(False) %} - [{{quality}}]{% endif %}"
       along:
         extensions:
