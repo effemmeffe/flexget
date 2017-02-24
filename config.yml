@@ -472,9 +472,11 @@ tasks:
     template:
       - disable-seen-retry
       - series-metainfo
+      - pushbullet
     filesystem:
       path:
         - "/{? folder.root ?}{? folder.downseries ?}"
+        - "/{? folder.root ?}{? folder.downmanual ?}"
       recursive: yes
       retrieve: files
       regexp: '.*\.(avi|mkv|mp4)$'
@@ -506,9 +508,11 @@ tasks:
     template:
       - disable-seen-retry
       - movies-metainfo
+      - pushbullet
     filesystem:
       path:
         - "/{? folder.root ?}{? folder.downmovies ?}"
+        - "/{? folder.root ?}{? folder.downmanual ?}"
       recursive: yes
       retrieve: files
       regexp: '.*\.(avi|mkv|mp4)$'
