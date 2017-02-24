@@ -24,6 +24,7 @@ converted
 # python files #
 ################
 *.pyc
+plugins/*.pyc
 
 
 # Logs and databases #
