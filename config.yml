@@ -170,7 +170,7 @@ templates:
       main_file_only: yes
       include_subs: yes
       rename_like_files: yes
-      content_filename: "{{tmdb_name|pathscrub}} ({{tmdb_year}}){% if quality|default(False) %} - [{{quality}}]{% endif %}"
+      content_filename: "{{tmdb_name|default(movie_name)|pathscrub}} ({tmdb_year|default(movie_year)}}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
       path: "/{? folder.root ?}{? folder.downmovies ?}{{movie_name|pathscrub}}"
 
 ##### Synology config
@@ -213,9 +213,15 @@ templates:
 ##### Movies metainfo mainly for move and update tasks
 #
   movies-metainfo:
+    metainfo_movie: yes
     tmdb_lookup: yes
     parsing:
       movie: guessit
+
+
+
+
+
 
 tasks:
 
@@ -499,8 +505,8 @@ tasks:
       regexp: '.*\.(avi|mkv|mp4)$'
     accept_all: yes
     move:
-      to: "/{? folder.root ?}{? folder.series ?}{{tvdb_series_name|escape|replace('&#39;', '')|pathscrub}}/S{{tvdb_season|pad(2)}}/"
-      rename: "{{tvdb_series_name|escape|replace('&#39;', '')|pathscrub}} - {{tvdb_ep_id|default(series_id)}}{% if tvdb_ep_name|default(False) %} - {{tvdb_ep_name|pathscrub}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
+      to: "/{? folder.root ?}{? folder.series ?}{{tvdb_series_name|escape|replace('&#39;', '')|default(series_name)|pathscrub}}/S{{tvdb_season|pad(2)}}/"
+      rename: "{{tvdb_series_name|escape|replace('&#39;', '')|default(series_name)|pathscrub}} - {{tvdb_ep_id|default(series_id)}}{% if tvdb_ep_name|default(False) %} - {{tvdb_ep_name|pathscrub}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
       along:
         extensions:
           - srt
@@ -544,8 +550,8 @@ tasks:
         - \btrailer\b
         - \bsample\b
     move:
-      to: "/{? folder.root ?}{? folder.movies ?}{{tmdb_name|pathscrub}} ({{tmdb_year}})"
-      rename: "{{tmdb_name|pathscrub}} ({{tmdb_year}}){% if quality|default(False) %} - [{{quality}}]{% endif %}"
+      to: "/{? folder.root ?}{? folder.movies ?}{{tmdb_name|default(movie_name)|pathscrub}} ({{tmdb_year|default(movie_year)}})"
+      rename: "{{tmdb_name|default(movie_name)|pathscrub}} ({{tmdb_year|default(movie_year)}}){% if quality|default(False) %} - [{{quality}}]{% endif %}"
       along:
         extensions:
           - srt
