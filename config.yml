@@ -72,10 +72,10 @@ templates:
 ##### Common rejections
 #
   reject:
-    trakt_lookup:
-      username: "{? trakt.user ?}"
-    if:
-      - trakt_watched: reject
+#    trakt_lookup:
+#      username: "{? trakt.user ?}"
+#    if:
+#      - trakt_watched: reject
     regexp:
       reject:
         - \b(s|d)ub(s|bed|lado|titulado)?\b
@@ -172,6 +172,12 @@ templates:
       rename_like_files: yes
       content_filename: "{{tmdb_name|pathscrub}} ({{tmdb_year}}){% if quality|default(False) %} - [{{quality}}]{% endif %}"
       path: "/{? folder.root ?}{? folder.downmovies ?}{{movie_name|pathscrub}}"
+
+##### Synology config
+#
+  synology:
+    download:
+      path: "{? folder.synology ?}"
 
 ##### Pushbullet config
 #
@@ -287,6 +293,11 @@ tasks:
       - torrents
       - transmission-series
       - pushbullet
+#      - synology
+    trakt_lookup:
+      username: "{? trakt.user ?}"
+    if:
+      - trakt_watched: reject
     inputs:
       - rss: https://eztv.ag/ezrss.xml
       - rss: https://extratorrent.cc/rss.xml?cid=8&type=new
@@ -303,6 +314,10 @@ tasks:
       - torrents
       - transmission-series
 #      - pushbullet
+    trakt_lookup:
+      username: "{? trakt.user ?}"
+    if:
+      - trakt_watched: reject
     magnets: yes
     convert_magnet:
       timeout: 10 seconds
@@ -392,6 +407,7 @@ tasks:
       - reject
       - torrents
       - transmission-movies
+#      - synology
 #      - pushbullet
     exists_movie:
       - "/{? folder.root ?}{? folder.downmovies ?}"
@@ -431,6 +447,7 @@ tasks:
       - reject
       - torrents
       - transmission-movies
+#      - synology
 #      - pushbullet
     exists_movie:
       - "/{? folder.root ?}{? folder.downmovies ?}"
@@ -496,6 +513,11 @@ tasks:
           list: subtitles
           path: "{{location}}"
           remove_after: 7 days
+    kodi_library:
+      action: scan
+      category: video
+      url: http://192.168.254.8
+      port: 8080
     exec:
       on_exit:
         phase: find "/{? folder.root ?}{? folder.downseries ?}"* -type d -empty -delete
@@ -522,7 +544,7 @@ tasks:
         - \btrailer\b
         - \bsample\b
     move:
-      to: "/{? folder.root ?}{? folder.movies ?}{{tmdb_name|pathscrub}} ({{tmdb_movie_year}})"
+      to: "/{? folder.root ?}{? folder.movies ?}{{tmdb_name|pathscrub}} ({{tmdb_year}})"
       rename: "{{tmdb_name|pathscrub}} ({{tmdb_year}}){% if quality|default(False) %} - [{{quality}}]{% endif %}"
       along:
         extensions:
@@ -536,6 +558,11 @@ tasks:
           list: subtitles
           path: "{{location}}"
           remove_after: 7 days
+    kodi_library:
+      action: scan
+      category: video
+      url: http://192.168.254.8
+      port: 8080
     exec:
       on_exit:
         phase: find "/{? folder.root ?}{? folder.downmovies ?}"* -type d -empty -delete
