@@ -72,10 +72,6 @@ templates:
 ##### Common rejections
 #
   reject:
-#    trakt_lookup:
-#      username: "{? trakt.user ?}"
-#    if:
-#      - trakt_watched: reject
     regexp:
       reject:
         - \b(s|d)ub(s|bed|lado|titulado)?\b
@@ -301,6 +297,7 @@ tasks:
       - pushbullet
 #      - synology
     trakt_lookup:
+      account: "{? trakt.account ?}"
       username: "{? trakt.user ?}"
     if:
       - trakt_watched: reject
@@ -321,6 +318,7 @@ tasks:
       - transmission-series
 #      - pushbullet
     trakt_lookup:
+      account: "{? trakt.account ?}"
       username: "{? trakt.user ?}"
     if:
       - trakt_watched: reject
@@ -514,6 +512,9 @@ tasks:
         subdirs:
           - Subs
       clean_source: 50
+    regexp:
+      reject:
+        - rarbg.mp4
     list_add:
       - subtitle_list:
           list: subtitles
@@ -549,6 +550,7 @@ tasks:
       reject:
         - \btrailer\b
         - \bsample\b
+        - rarbg.mp4
     move:
       to: "/{? folder.root ?}{? folder.movies ?}{{tmdb_name|default(movie_name)|pathscrub}} ({{tmdb_year|default(movie_year)}})"
       rename: "{{tmdb_name|default(movie_name)|pathscrub}} ({{tmdb_year|default(movie_year)}}){% if quality|default(False) %} - [{{quality}}]{% endif %}"
