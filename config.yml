@@ -294,7 +294,7 @@ tasks:
       - reject
       - torrents
       - transmission-series
-      - pushbullet
+#      - pushbullet
 #      - synology
     trakt_lookup:
       account: "{? trakt.account ?}"
@@ -651,3 +651,17 @@ tasks:
           account: "{? trakt.account ?}"
           list: "{? trakt.series ?}"
           type: shows
+
+
+
+##### Sync the seen episodes in the db with trakt series list
+  seed-series-db-once:
+    manual: yes
+    disable: [seen]
+    accept_all: yes
+    next_trakt_episodes:
+      account: '{? trakt.account ?}'
+      context: watched # set this to collected if you want to use that instead
+      list: watched
+      strip_dates: yes
+    set_series_begin: yes
