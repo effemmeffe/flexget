@@ -23,8 +23,9 @@ templates:
 ##### Series config
 #
   series:
+    metainfo_series: yes
     thetvdb_lookup: yes
-    tvmaze_lookup: yes
+#    tvmaze_lookup: yes
     include: series.yml
     configure_series:
       from:
@@ -34,10 +35,11 @@ templates:
         timeframe: 16 hours
         target: hdtv+ 720p
         quality: webrip+ 720p
+#        quality: webrip+
         propers: 16 hours
         specials: no
     content_size:
-      min: 350
+      min: 250
     content_filter:
       require:
         - '*.mkv'
@@ -45,6 +47,7 @@ templates:
 ##### Movies config
 #
   movies-1080p:
+    metainfo_movie: yes
     tmdb_lookup: yes
     movie_list: trakt-movies
     quality: 1080p webdl+
@@ -53,6 +56,7 @@ templates:
       max: 6000
 
   movies-720p:
+    metainfo_movie: yes
     tmdb_lookup: yes
     movie_list: trakt-movies
     quality: 720p webdl+
@@ -100,35 +104,35 @@ templates:
       path: "/{? folder.root ?}"
       space: 5000
     # Requires log_filter plugin
-    log_filter:
-      task:
-        - marked seen
-        - because quality already downloaded
-        - because episode has already been downloaded
-        - Task does not have any
-      move:
-        - left because it exceeds safety value
-        - does not exists (anymore)
-      urlrewriter:
-        - URL rewritten to
-      enzyme.mkv:
-        - Reading
-        - Processing
-      enzyme.parsers.ebml.core:
-        - ignored
-        - Maximum level
-      subliminal.video:
-        - Scanning video
-      parser_internal:
-        - appears to be an episode pack
-      content_size:
-        - rejecting
-      search_rss:
-        - Error
-      assume_quality:
-        - ""
-      utils.requests:
-        - Waiting
+#    log_filter:
+#      task:
+#        - marked seen
+#        - because quality already downloaded
+#        - because episode has already been downloaded
+#        - Task does not have any
+#      move:
+#        - left because it exceeds safety value
+#        - does not exists (anymore)
+#      urlrewriter:
+#        - URL rewritten to
+#      enzyme.mkv:
+#        - Reading
+#        - Processing
+#      enzyme.parsers.ebml.core:
+#        - ignored
+#        - Maximum level
+#      subliminal.video:
+#        - Scanning video
+#      parser_internal:
+#        - appears to be an episode pack
+#      content_size:
+#        - rejecting
+#      search_rss:
+#        - Error
+#      assume_quality:
+#        - ""
+#      utils.requests:
+#        - Waiting
 
 ##### Common torrents config
 #
@@ -166,7 +170,7 @@ templates:
       main_file_only: yes
       include_subs: yes
       rename_like_files: yes
-      content_filename: "{{tmdb_name|default(movie_name)|pathscrub}} ({tmdb_year|default(movie_year)}}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
+      content_filename: "{{tmdb_name|default(movie_name)|pathscrub}}{% if movie_year|default(False) %}({tmdb_year|default(movie_year)}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
       path: "/{? folder.root ?}{? folder.downmovies ?}{{movie_name|pathscrub}}"
 
 ##### Synology config
@@ -181,7 +185,8 @@ templates:
     notify:
       entries:
         title: "[flexget] {{task}}"
-        message: "{{title}}"
+#        message: "{{title}}"
+        message: "{{filename}}"
         via:
           - pushbullet:
               api_key: "{? pushbullet.api ?}"
@@ -199,6 +204,7 @@ templates:
   series-metainfo:
     metainfo_series: yes
     thetvdb_lookup: yes
+#    tvmaze_lookup: yes
 
 ##### Guessit parsing for some series tasks, not applied to all tasks because it causes issues with "name (year)" based series, like scandal
 #
@@ -234,7 +240,7 @@ tasks:
       path: "/{? folder.root ?}{? folder.series ?}"
       recursive: yes
       retrieve: files
-      regexp: '.*\.(avi|mkv|mp4)$'
+      regexp: '.*\.(avi|mkv|mp4|m4v)$'
     accept_all: yes
     configure_series:
       from:
@@ -261,7 +267,7 @@ tasks:
       type: shows
     accept_all: yes
     set:
-      title: "{{tvdb_series_name|escape|replace('&#39;', '')}}"
+      title: "{{tvdb_series_name|default(series_name)}}"
     list_add:
       - entry_list: trakt-series
 
@@ -354,7 +360,7 @@ tasks:
       path: "/{? folder.root ?}{? folder.movies ?}"
       recursive: yes
       retrieve: files
-      regexp: '.*\.(avi|mkv|mp4)$'
+      regexp: '.*\.(avi|mkv|mp4|m4v)$'
     accept_all: yes
     list_remove:
       - movie_list: trakt-movies
@@ -497,14 +503,14 @@ tasks:
     filesystem:
       path:
         - "/{? folder.root ?}{? folder.downseries ?}"
-        - "/{? folder.root ?}{? folder.downmanual ?}"
+        - "/{? folder.root ?}{? folder.downseriesmanual ?}"
       recursive: yes
       retrieve: files
-      regexp: '.*\.(avi|mkv|mp4)$'
+      regexp: '.*\.(avi|mkv|mp4|m4v)$'
     accept_all: yes
     move:
-      to: "/{? folder.root ?}{? folder.series ?}{{tvdb_series_name|escape|replace('&#39;', '')|default(series_name)|pathscrub}}/S{{tvdb_season|pad(2)}}/"
-      rename: "{{tvdb_series_name|escape|replace('&#39;', '')|default(series_name)|pathscrub}} - {{tvdb_ep_id|default(series_id)}}{% if tvdb_ep_name|default(False) %} - {{tvdb_ep_name|pathscrub}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
+      to: "/{? folder.root ?}{? folder.series ?}{{tvdb_series_name|default(series_name)|pathscrub}}/S{{tvdb_season|pad(2)|default(series_season|pad(2))}}/"
+      rename: "{{tvdb_series_name|default(series_name)|pathscrub}} - {{tvdb_ep_id|default(series_id)}}{% if tvdb_ep_name|default(False) %} - {{tvdb_ep_name|pathscrub}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
       along:
         extensions:
           - srt
@@ -514,7 +520,8 @@ tasks:
       clean_source: 50
     regexp:
       reject:
-        - rarbg.mp4
+        - .*(rarbg|RARBG).mp4
+        - .*(rarbg|RARBG).(com|COM)
     list_add:
       - subtitle_list:
           list: subtitles
@@ -523,7 +530,7 @@ tasks:
     kodi_library:
       action: scan
       category: video
-      url: http://192.168.254.8
+      url: http://192.168.254.100
       port: 8080
     exec:
       on_exit:
@@ -541,16 +548,17 @@ tasks:
     filesystem:
       path:
         - "/{? folder.root ?}{? folder.downmovies ?}"
-        - "/{? folder.root ?}{? folder.downmanual ?}"
+        - "/{? folder.root ?}{? folder.downmoviesmanual ?}"
       recursive: yes
       retrieve: files
-      regexp: '.*\.(avi|mkv|mp4)$'
+      regexp: '.*\.(avi|mkv|mp4|m4v)$'
     accept_all: yes
     regexp:
       reject:
         - \btrailer\b
         - \bsample\b
-        - rarbg.mp4
+        - .*(rarbg|RARBG).mp4
+        - .*(rarbg|RARBG).(com|COM)
     move:
       to: "/{? folder.root ?}{? folder.movies ?}{{tmdb_name|default(movie_name)|pathscrub}} ({{tmdb_year|default(movie_year)}})"
       rename: "{{tmdb_name|default(movie_name)|pathscrub}} ({{tmdb_year|default(movie_year)}}){% if quality|default(False) %} - [{{quality}}]{% endif %}"
@@ -569,7 +577,7 @@ tasks:
     kodi_library:
       action: scan
       category: video
-      url: http://192.168.254.8
+      url: http://192.168.254.100
       port: 8080
     exec:
       on_exit:
@@ -639,7 +647,7 @@ tasks:
     template:
       - disable-seen-retry
       - series-metainfo
-      - pushbullet
+#      - pushbullet
     trakt_list:
       account: "{? trakt.account ?}"
       list: "{? trakt.series ?}"
@@ -661,7 +669,8 @@ tasks:
     accept_all: yes
     next_trakt_episodes:
       account: '{? trakt.account ?}'
-      context: watched # set this to collected if you want to use that instead
-      list: watched
+#      context: watched # set this to collected if you want to use that instead
+      context: collected # set this to watched if you want to use that instead
+      list: "{? trakt.series ?}"
       strip_dates: yes
     set_series_begin: yes
