@@ -2,16 +2,16 @@ variables: my_secrets.yml
 schedules:
   - tasks: ['populate-*', 'clean-*', 'update-*']
     schedule:
-      hour: 0
+      hour: 15
   - tasks: ['fill-*', '*-rss']
     schedule:
-      minute: 0,30
+      hour: 15
   - tasks: ['*-discover', '*-manual']
     schedule:
-      hour: '*/2'
+      hour: 15
   - tasks: ['move-*', download-subtitles]
     schedule:
-      minute: 15,45
+      hour: 15
 
 web_server:
   bind: 0.0.0.0
@@ -39,7 +39,7 @@ templates:
         propers: 16 hours
         specials: no
     content_size:
-      min: 250
+      min: 150
     content_filter:
       require:
         - '*.mkv'
@@ -52,8 +52,8 @@ templates:
     movie_list: trakt-movies
     quality: 1080p webdl+
     content_size:
-      min: 1000
-      max: 6000
+      min: 800
+      max: 9000
 
   movies-720p:
     metainfo_movie: yes
@@ -148,7 +148,6 @@ templates:
       thepiratebay.se: 10 seconds
       thepiratebay.org: 10 seconds
       nyaa.se: 3 seconds
-      extratorrent: 3 seconds
       limetorrents: 3 seconds
 
 ##### Transmission series config
@@ -249,7 +248,9 @@ tasks:
           retrieve: dirs
       settings:
         tracking: no
-
+    exec:
+      on_start:
+        phase: echo "Started"
 
 ##### Fetch, format and output trakt series list to a custom entry list
 #
@@ -309,8 +310,9 @@ tasks:
       - trakt_watched: reject
     inputs:
       - rss: https://eztv.ag/ezrss.xml
-      - rss: https://extratorrent.cc/rss.xml?cid=8&type=new
-      - rss: https://www.limetorrents.cc/rss/20/
+      - rss: https://rarbg.com/rssdd.php?category=18
+      - rss: https://www.demonoid.pw/rss/3.xml
+#      - rss: https://www.limetorrents.cc/rss/20/
 
 
 ##### Discover and download older episodes and pilots from recently added series
@@ -341,8 +343,6 @@ tasks:
       from:
         - piratebay:
             category: highres tv
-        - extratorrent:
-            category: tv
         - limetorrents:
             category: tv
 
@@ -434,8 +434,6 @@ tasks:
       from:
         - piratebay:
             category: highres movies
-        - extratorrent:
-            category: movies
         - limetorrents:
             category: movies
     list_match:
@@ -474,10 +472,10 @@ tasks:
       from:
         - piratebay:
             category: highres movies
-        - extratorrent:
-            category: movies
         - limetorrents:
             category: movies
+        - search_rss: https://www.demonoid.pw/rss/1.xml
+        - search_rss: https://www.limetorrents.cc/rss/16/
     if:
       - tmdb_year > now.year - 1: reject
     list_match:
