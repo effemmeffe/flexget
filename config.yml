@@ -2,16 +2,17 @@ variables: my_secrets.yml
 schedules:
   - tasks: ['populate-*', 'clean-*', 'update-*']
     schedule:
-      hour: 15
+      hour: "*/3"
   - tasks: ['fill-*', '*-rss']
     schedule:
-      hour: 15
+      hour: "*/3"
   - tasks: ['*-discover', '*-manual']
     schedule:
-      hour: 15
-  - tasks: ['move-*', download-subtitles]
+      hour: "*/3"
+  - tasks: ['move-*', '*-subtitles']
     schedule:
-      hour: 15
+      hour: "*/3"
+
 
 web_server:
   bind: 0.0.0.0
@@ -33,8 +34,8 @@ templates:
       settings:
         identified_by: ep
         timeframe: 16 hours
-        target: hdtv+ 720p
-        quality: webrip+ 720p
+        #target: hdtv+ 720p
+        #quality: webrip 720p
 #        quality: webrip+
         propers: 16 hours
         specials: no
@@ -48,21 +49,27 @@ templates:
 #
   movies-1080p:
     metainfo_movie: yes
-    tmdb_lookup: yes
+#    tmdb_lookup: yes
+    trakt_lookup:
+      account: "{? trakt.accout ?}"
+      username: "{? trakt.user ?}"
     movie_list: trakt-movies
-    quality: 1080p webdl+
+    quality: 1080p webdl
     content_size:
       min: 800
       max: 9000
 
   movies-720p:
     metainfo_movie: yes
-    tmdb_lookup: yes
+#    tmdb_lookup: yes
+    trakt_lookup:
+      account: "{? trakt.accout ?}"
+      username: "{? trakt.user ?}"
     movie_list: trakt-movies
-    quality: 720p webdl+
+    quality: 720p webdl
     content_size:
       min: 500
-      max: 3000
+      max: 5000
 
 ##### Transmission config
 #
@@ -145,8 +152,8 @@ templates:
     # Can remove if you upgrade to python 2.7.9+ or install requests[security]
     #verify_ssl_certificates: no
     domain_delay:
-      thepiratebay.se: 10 seconds
-      thepiratebay.org: 10 seconds
+#      thepiratebay.se: 10 seconds
+#      thepiratebay.org: 10 seconds
       nyaa.se: 3 seconds
       limetorrents: 3 seconds
 
@@ -169,8 +176,11 @@ templates:
       main_file_only: yes
       include_subs: yes
       rename_like_files: yes
-      content_filename: "{{tmdb_name|default(movie_name)|pathscrub}}{% if movie_year|default(False) %}({tmdb_year|default(movie_year)}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
+#      content_filename: "{{tmdb_name|default(movie_name)|pathscrub}}{% if movie_year|default(False) %}({tmdb_year|default(movie_year)}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
+#      path: "/{? folder.root ?}{? folder.downmovies ?}{{movie_name|pathscrub}}"
+      content_filename: "{{trakt_movie_name|default(movie_name)|pathscrub}}{% if movie_year|default(False) %}({trakt_movie_year|default(movie_year)}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
       path: "/{? folder.root ?}{? folder.downmovies ?}{{movie_name|pathscrub}}"
+
 
 ##### Synology config
 #
@@ -215,7 +225,10 @@ templates:
 #
   movies-metainfo:
     metainfo_movie: yes
-    tmdb_lookup: yes
+#    tmdb_lookup: yes
+    trakt_lookup:
+      account: "{? trakt.accout ?}"
+      username: "{? trakt.user ?}"
     parsing:
       movie: guessit
 
@@ -309,10 +322,10 @@ tasks:
     if:
       - trakt_watched: reject
     inputs:
-      - rss: https://eztv.ag/ezrss.xml
-      - rss: https://rarbg.com/rssdd.php?category=18
-      - rss: https://www.demonoid.pw/rss/3.xml
-#      - rss: https://www.limetorrents.cc/rss/20/
+      - rss: https://eztv.unblocked.gdn/ezrss.xml 
+      - rss: https://rarbgmirror.org/rssdd.php?category=18
+      - rss: https://demonoid.unblocked.gdn/rss/3.xml
+#      - rss: https://www.limetorrents.gdn/rss/20/
 
 
 ##### Discover and download older episodes and pilots from recently added series
@@ -335,16 +348,17 @@ tasks:
       timeout: 10 seconds
       force: yes
     discover:
-      release_estimations: strict
+      release_estimations: ignore
       interval: 15 minutes
       what:
         - next_series_episodes:
             from_start: yes
       from:
-        - piratebay:
-            category: highres tv
-        - limetorrents:
-            category: tv
+#        - piratebay:
+#            category: highres tv
+#        - limetorrents:
+#            category: tv
+        - search_rss: https://limetorrents.unblocked.gdn/rss/20/
 
 
 ########## MOVIES ##########
@@ -427,15 +441,17 @@ tasks:
       timeout: 10 seconds
       force: yes
     discover:
-      release_estimations: loose
+      release_estimations: ignore
       interval: 15 minutes
       what:
         - movie_list: trakt-movies
       from:
-        - piratebay:
-            category: highres movies
-        - limetorrents:
-            category: movies
+#        - piratebay:
+#            category: highres movies
+#        - limetorrents:
+#            category: movies
+#        - search_rss: https://limetorrents.unblocked.gdn/rss/16/
+        - search_rss: https://yts.am/rss/0/1080p/all/0
     list_match:
       from:
         - movie_list: trakt-movies
@@ -465,19 +481,21 @@ tasks:
       timeout: 10 seconds
       force: yes
     discover:
-      release_estimations: loose
+      release_estimations: ignore
       interval: 15 minutes
       what:
         - movie_list: trakt-movies
       from:
-        - piratebay:
-            category: highres movies
-        - limetorrents:
-            category: movies
-        - search_rss: https://www.demonoid.pw/rss/1.xml
-        - search_rss: https://www.limetorrents.cc/rss/16/
+#        - piratebay:
+#            category: highres movies
+#        - limetorrents:
+#            category: movies
+#        - search_rss: https://demonoid.unblocked.gdn/rss/1.xml
+#        - search_rss: https://limetorrents.unblocked.gdn/rss/16/
+        - search_rss: https://yts.am/rss/0/720p/all/0
     if:
-      - tmdb_year > now.year - 1: reject
+#      - tmdb_year > now.year - 1: reject
+      - trakt_movie_year > now.year - 1: reject
     list_match:
       from:
         - movie_list: trakt-movies
@@ -509,6 +527,7 @@ tasks:
     move:
       to: "/{? folder.root ?}{? folder.series ?}{{tvdb_series_name|default(series_name)|pathscrub}}/S{{tvdb_season|pad(2)|default(series_season|pad(2))}}/"
       rename: "{{tvdb_series_name|default(series_name)|pathscrub}} - {{tvdb_ep_id|default(series_id)}}{% if tvdb_ep_name|default(False) %} - {{tvdb_ep_name|pathscrub}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
+
       along:
         extensions:
           - srt
@@ -558,8 +577,10 @@ tasks:
         - .*(rarbg|RARBG).mp4
         - .*(rarbg|RARBG).(com|COM)
     move:
-      to: "/{? folder.root ?}{? folder.movies ?}{{tmdb_name|default(movie_name)|pathscrub}} ({{tmdb_year|default(movie_year)}})"
-      rename: "{{tmdb_name|default(movie_name)|pathscrub}} ({{tmdb_year|default(movie_year)}}){% if quality|default(False) %} - [{{quality}}]{% endif %}"
+#      to: "/{? folder.root ?}{? folder.movies ?}{{tmdb_name|default(movie_name)|pathscrub}} ({{tmdb_year|default(movie_year)}})"
+#      rename: "{{tmdb_name|default(movie_name)|pathscrub}} ({{tmdb_year|default(movie_year)}}){% if quality|default(False) %} - [{{quality}}]{% endif %}"
+      to: "/{? folder.root ?}{? folder.movies ?}{{trakt_movie_name|default(movie_name)|pathscrub}} ({{trakt_movie_year|default(movie_year)}})"
+      rename: "{{trakt_movie_name|default(movie_name)|pathscrub}} ({{trakt_movie_year|default(movie_year)}}){% if quality|default(False) %} - [{{quality}}]{% endif %}"
       along:
         extensions:
           - srt
@@ -672,3 +693,22 @@ tasks:
       list: "{? trakt.series ?}"
       strip_dates: yes
     set_series_begin: yes
+
+
+####################### MISC #########################
+  letterboxd-to-trakt:
+    disable: seen
+
+#    template:
+#      - disable-seen-retry
+    letterboxd:
+      username: "{? letterboxd.user ?}"
+      list: love-smile-cry
+    sort_by: added
+    #    max_results: 20  # <--- Set depending on how often you run the task; high enough that it will catch all new entries,
+    accept_all: yes    #      but low enough so as not to parse (much) more of the list than is necessary.
+    list_add:
+      - trakt_list:
+          account: "{? trakt.account ?}"
+          username: "{? trakt.user ?}"
+          list: love-smile-cry
