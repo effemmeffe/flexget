@@ -549,6 +549,8 @@ tasks:
       category: video
       url: http://192.168.254.100
       port: 8080
+      username: "{? kodi.username ?}"
+      password: "{? kodi.password ?}"
     exec:
       on_exit:
         phase: find "/{? folder.root ?}{? folder.downseries ?}"* -type d -empty -delete
@@ -598,6 +600,8 @@ tasks:
       category: video
       url: http://192.168.254.100
       port: 8080
+      username: "{? kodi.username ?}"
+      password: "{? kodi.password ?}"
     exec:
       on_exit:
         phase: find "/{? folder.root ?}{? folder.downmovies ?}"* -type d -empty -delete
