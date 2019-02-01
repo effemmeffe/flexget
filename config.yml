@@ -1,17 +1,21 @@
 variables: my_secrets.yml
 schedules:
-  - tasks: ['populate-*', 'clean-*', 'update-*']
+        #  - tasks: ['populate-*', 'clean-*', 'update-*']
+        #    schedule:
+        #      hour: "*/3"
+        #  - tasks: ['fill-*', '*-rss']
+        #    schedule:
+        #      hour: "*/3"
+        #  - tasks: ['*-discover', '*-manual']
+        #    schedule:
+        #      hour: "*/3"
+        #  - tasks: ['move-*', '*-subtitles']
+        #    schedule:
+        #      hour: "*/3"
+  - tasks: ['*']
     schedule:
-      hour: "*/3"
-  - tasks: ['fill-*', '*-rss']
-    schedule:
-      hour: "*/3"
-  - tasks: ['*-discover', '*-manual']
-    schedule:
-      hour: "*/3"
-  - tasks: ['move-*', '*-subtitles']
-    schedule:
-      hour: "*/3"
+      hour: "*/1"
+
 
 
 web_server:
@@ -39,6 +43,7 @@ templates:
 #        quality: webrip+
         propers: 16 hours
         specials: no
+        season_packs: always
     content_size:
       min: 150
     content_filter:
@@ -243,7 +248,7 @@ tasks:
 
 ##### Populates the series database with the files on the library, to avoid duplicate downloads
 #
-  populate-series-db:
+  populate-series-db: # task
     priority: 1
     template:
       - series-metainfo
@@ -267,7 +272,7 @@ tasks:
 
 ##### Fetch, format and output trakt series list to a custom entry list
 #
-  fill-series-list:
+  fill-series-list: # task
     priority: 2
     template:
       - disable-seen-retry
@@ -288,7 +293,7 @@ tasks:
 
 ##### Download episodes from manually downloaded torrents
 #
-  download-series-manual:
+  download-series-manual: # task
     priority: 4
     template:
       - disable-seen-retry
@@ -307,7 +312,7 @@ tasks:
 
 ##### Download episodes from RSS feeds
 #
-  download-series-rss:
+  download-series-rss: # task
     priority: 5
     template:
       - series
@@ -322,15 +327,12 @@ tasks:
     if:
       - trakt_watched: reject
     inputs:
-      - rss: https://eztv.unblocked.gdn/ezrss.xml 
-      - rss: https://rarbgmirror.org/rssdd.php?category=18
-      - rss: https://demonoid.unblocked.gdn/rss/3.xml
-#      - rss: https://www.limetorrents.gdn/rss/20/
+      - rss: https://torrentgalaxy.org/rss.php?cat=41
 
 
 ##### Discover and download older episodes and pilots from recently added series
 #
-  download-series-discover:
+  download-series-discover: # task
     priority: 8
     template:
       - series
@@ -353,19 +355,16 @@ tasks:
       what:
         - next_series_episodes:
             from_start: yes
+            #backfill: yes
       from:
-#        - piratebay:
-#            category: highres tv
-#        - limetorrents:
-#            category: tv
-        - search_rss: https://limetorrents.unblocked.gdn/rss/20/
+        - search_rss: https://torrentgalaxy.org/rss.php?cat=41
 
 
 ########## MOVIES ##########
 
 ##### Remove manually downloaded movies from the movie queue and trakt list
 #
-  clean-movies-queue:
+  clean-movies-queue: # task
     priority: 31
     template:
       - disable-seen-retry
@@ -386,7 +385,7 @@ tasks:
 
 ##### Fill the movie queue with movies from trakt list
 #
-  fill-movies-queue:
+  fill-movies-queue: # task
     priority: 32
     trakt_list:
       account: "{? trakt.account ?}"
@@ -400,7 +399,7 @@ tasks:
 
 ##### Download movies manually downloaded torrents
 #
-  download-movies-manual:
+  download-movies-manual: # task
     priority: 34
     template:
       - disable-seen-retry
@@ -424,7 +423,7 @@ tasks:
 
 ##### Discover and download 1080p movies
 #
-  download-movies-1080p-discover:
+  download-movies-1080p-discover: # task
     priority: 37
     template:
       - movies-1080p
@@ -446,12 +445,8 @@ tasks:
       what:
         - movie_list: trakt-movies
       from:
-#        - piratebay:
-#            category: highres movies
-#        - limetorrents:
-#            category: movies
-#        - search_rss: https://limetorrents.unblocked.gdn/rss/16/
         - search_rss: https://yts.am/rss/0/1080p/all/0
+        - search_rss: https://torrentgalaxy.org/rss.php?cat=42
     list_match:
       from:
         - movie_list: trakt-movies
@@ -464,7 +459,7 @@ tasks:
 
 ##### Discover and download 720p movies, if the movie is not recent
 #
-  download-movies-720p-discover:
+  download-movies-720p-discover: # task
     priority: 38
     template:
       - movies-720p
@@ -486,13 +481,8 @@ tasks:
       what:
         - movie_list: trakt-movies
       from:
-#        - piratebay:
-#            category: highres movies
-#        - limetorrents:
-#            category: movies
-#        - search_rss: https://demonoid.unblocked.gdn/rss/1.xml
-#        - search_rss: https://limetorrents.unblocked.gdn/rss/16/
         - search_rss: https://yts.am/rss/0/720p/all/0
+        - search_rss: https://torrentgalaxy.org/rss.php?cat=1
     if:
 #      - tmdb_year > now.year - 1: reject
       - trakt_movie_year > now.year - 1: reject
@@ -510,7 +500,7 @@ tasks:
 
 ##### Move series from downloads folder to respective folders, along with existing subtitles and adding the files to the subtitle queue
 #
-  move-series:
+  move-series: # task
     priority: 41
     template:
       - disable-seen-retry
@@ -558,7 +548,7 @@ tasks:
 
 ##### Move movies from downloads folder to the movies folder, along with possible subtitles and adding the files to the subtitle queue
 #
-  move-movies:
+  move-movies: # task
     priority: 43
     template:
       - disable-seen-retry
@@ -609,7 +599,7 @@ tasks:
 
 ##### Download subtitles for the previously queued files
 #
-  download-subtitles:
+  download-subtitles: # task
     priority: 45
     template:
       - disable-seen-retry
@@ -627,7 +617,7 @@ tasks:
 
 ##### Clean finished torrents from transmission
 #
-  clean-transmission:
+  clean-transmission: # task
     priority: 47
     disable: details
     clean_transmission:
@@ -639,7 +629,7 @@ tasks:
 
 ##### Update trakt series list from local series folders, excluding the ones that already ended
 #
-  update-series-list:
+  update-series-list: # task
     priority: 51
     template:
       - disable-seen-retry
@@ -664,7 +654,7 @@ tasks:
 
 ##### Clean the series that already ended from trakt series list
 #
-  clean-series-list:
+  clean-series-list: # task
     priority: 53
     delay: 8 day
     template:
@@ -686,7 +676,7 @@ tasks:
 
 
 ##### Sync the seen episodes in the db with trakt series list
-  seed-series-db-once:
+  seed-series-db-once: # task
     manual: yes
     disable: [seen]
     accept_all: yes
@@ -700,7 +690,7 @@ tasks:
 
 
 ####################### MISC #########################
-  letterboxd-to-trakt:
+  letterboxd-to-trakt: # task
     disable: seen
 
 #    template:
@@ -716,3 +706,10 @@ tasks:
           account: "{? trakt.account ?}"
           username: "{? trakt.user ?}"
           list: love-smile-cry
+
+
+  copy-log-files: # task
+    priority: 100
+    exec:
+      on_exit:
+        phase: /home/fmf/.flexget/copy-log.sh
