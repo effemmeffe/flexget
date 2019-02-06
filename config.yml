@@ -1,4 +1,5 @@
 variables: my_secrets.yml
+
 schedules:
         #  - tasks: ['populate-*', 'clean-*', 'update-*']
         #    schedule:
@@ -14,7 +15,8 @@ schedules:
         #      hour: "*/3"
   - tasks: ['*']
     schedule:
-      hour: "*/1"
+      hour: "*/4"
+#      minute: "*/15"
 
 
 
@@ -445,8 +447,18 @@ tasks:
       what:
         - movie_list: trakt-movies
       from:
-        - search_rss: https://yts.am/rss/0/1080p/all/0
-        - search_rss: https://torrentgalaxy.org/rss.php?cat=42
+        - yts: yes
+
+#        - search_rss:
+#            username: effemmeffe@gmail.com
+#            password: KL7MPcdO5d7W478GvIwl
+#            url: https://yts.am/api/v2/list_movies.json?query_term={{search_term}}&quality=1080p
+#            link:
+#              - link
+#              - magneturi
+
+#        - search_rss: https://torrentgalaxy.org/rss.php?cat=42
+
     list_match:
       from:
         - movie_list: trakt-movies
@@ -481,7 +493,14 @@ tasks:
       what:
         - movie_list: trakt-movies
       from:
-        - search_rss: https://yts.am/rss/0/720p/all/0
+        - yts: yes
+
+#        - search_rss:
+#            url: https://yts.am/api/v2/list_movies.json?query_term={{search_term}}&quality=720p
+#            link:
+#              - link
+#              - magneturi
+
         - search_rss: https://torrentgalaxy.org/rss.php?cat=1
     if:
 #      - tmdb_year > now.year - 1: reject
@@ -539,7 +558,7 @@ tasks:
       category: video
       url: http://192.168.254.100
       port: 8080
-      username: "{? kodi.username ?}"
+      username: "{? kodi.user ?}"
       password: "{? kodi.password ?}"
     exec:
       on_exit:
@@ -590,7 +609,7 @@ tasks:
       category: video
       url: http://192.168.254.100
       port: 8080
-      username: "{? kodi.username ?}"
+      username: "{? kodi.user ?}"
       password: "{? kodi.password ?}"
     exec:
       on_exit:
@@ -613,6 +632,13 @@ tasks:
       exact_match: yes
       languages:
         - eng
+      authentication:
+        addic7ed:
+          username: "{? addic7ed.user ?}"
+          password: "{? addic7ed.password ?}"
+        opensubtitles:
+          username: "{? opensubtitles.user ?}"
+          password: "{? opensubtitles.passsword ?}"
 
 
 ##### Clean finished torrents from transmission
