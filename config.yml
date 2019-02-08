@@ -78,6 +78,16 @@ templates:
       min: 500
       max: 5000
 
+  movies-noquality:
+    metainfo_movie: yes
+    trakt_lookup:
+      account: "{? trakt.accout ?}"
+      username: "{? trakt.user ?}"
+    movie_list: trakt-movies
+    content_size:
+      min: 800
+      max: 9000
+
 ##### Transmission config
 #
   transmission-anchors:
@@ -160,8 +170,7 @@ templates:
     #verify_ssl_certificates: no
     domain_delay:
 #      thepiratebay.se: 10 seconds
-#      thepiratebay.org: 10 seconds
-      nyaa.se: 3 seconds
+      thepiratebay.org: 10 seconds
       limetorrents: 3 seconds
 
 ##### Transmission series config
@@ -251,7 +260,7 @@ tasks:
 ##### Populates the series database with the files on the library, to avoid duplicate downloads
 #
   populate-series-db: # task
-    priority: 1
+    priority: 10
     template:
       - series-metainfo
     seen: local
@@ -275,7 +284,7 @@ tasks:
 ##### Fetch, format and output trakt series list to a custom entry list
 #
   fill-series-list: # task
-    priority: 2
+    priority: 20
     template:
       - disable-seen-retry
       - series-metainfo
@@ -296,7 +305,7 @@ tasks:
 ##### Download episodes from manually downloaded torrents
 #
   download-series-manual: # task
-    priority: 4
+    priority: 30
     template:
       - disable-seen-retry
       - series-metainfo
@@ -315,7 +324,7 @@ tasks:
 ##### Download episodes from RSS feeds
 #
   download-series-rss: # task
-    priority: 5
+    priority: 40
     template:
       - series
       - reject
@@ -335,7 +344,7 @@ tasks:
 ##### Discover and download older episodes and pilots from recently added series
 #
   download-series-discover: # task
-    priority: 8
+    priority: 50
     template:
       - series
       - reject
@@ -367,7 +376,7 @@ tasks:
 ##### Remove manually downloaded movies from the movie queue and trakt list
 #
   clean-movies-queue: # task
-    priority: 31
+    priority: 60
     template:
       - disable-seen-retry
       - movies-metainfo
@@ -388,7 +397,7 @@ tasks:
 ##### Fill the movie queue with movies from trakt list
 #
   fill-movies-queue: # task
-    priority: 32
+    priority: 70
     trakt_list:
       account: "{? trakt.account ?}"
       list: "{? trakt.movies ?}"
@@ -402,7 +411,7 @@ tasks:
 ##### Download movies manually downloaded torrents
 #
   download-movies-manual: # task
-    priority: 34
+    priority: 80
     template:
       - disable-seen-retry
       - movies-metainfo
@@ -423,10 +432,26 @@ tasks:
           type: movies
 
 
+##### Download movies from RSS feeds
+#
+  download-movies-rss: # task
+    priority: 90
+    template:
+      - movies-noquality
+      - reject
+      - torrents
+      - transmission-movies
+    inputs:
+      - rss: { url: 'https://thepiratebay.org/rss/top100/201', silent: yes }
+      #- rss: { url: 'http://extratorrent.cc/rss.xml?cid=4', silent: yes }
+      #- rss: { url: 'http://www.torlock.com/movies/rss.xml', silent: yes }
+
+    seen: local
+
 ##### Discover and download 1080p movies
 #
   download-movies-1080p-discover: # task
-    priority: 37
+    priority: 100
     template:
       - movies-1080p
       - reject
@@ -448,16 +473,11 @@ tasks:
         - movie_list: trakt-movies
       from:
         - yts: yes
-
-#        - search_rss:
-#            username: effemmeffe@gmail.com
-#            password: KL7MPcdO5d7W478GvIwl
-#            url: https://yts.am/api/v2/list_movies.json?query_term={{search_term}}&quality=1080p
-#            link:
-#              - link
-#              - magneturi
-
-#        - search_rss: https://torrentgalaxy.org/rss.php?cat=42
+        - search_rss: https://torrentgalaxy.org/rss.php?cat=42
+        - piratebay:
+            category: movies
+        - limetorrents:
+            category: movies
 
     list_match:
       from:
@@ -472,7 +492,7 @@ tasks:
 ##### Discover and download 720p movies, if the movie is not recent
 #
   download-movies-720p-discover: # task
-    priority: 38
+    priority: 110
     template:
       - movies-720p
       - reject
@@ -480,6 +500,7 @@ tasks:
       - transmission-movies
 #      - synology
 #      - pushbullet
+
     exists_movie:
       - "/{? folder.root ?}{? folder.downmovies ?}"
       - "/{? folder.root ?}{? folder.movies ?}"
@@ -494,17 +515,11 @@ tasks:
         - movie_list: trakt-movies
       from:
         - yts: yes
+#        - search_rss: https://torrentgalaxy.org/rss.php?cat=1
 
-#        - search_rss:
-#            url: https://yts.am/api/v2/list_movies.json?query_term={{search_term}}&quality=720p
-#            link:
-#              - link
-#              - magneturi
 
-        - search_rss: https://torrentgalaxy.org/rss.php?cat=1
-    if:
-#      - tmdb_year > now.year - 1: reject
-      - trakt_movie_year > now.year - 1: reject
+#    if:
+#      - trakt_movie_year > now.year - 1: reject
     list_match:
       from:
         - movie_list: trakt-movies
@@ -520,7 +535,7 @@ tasks:
 ##### Move series from downloads folder to respective folders, along with existing subtitles and adding the files to the subtitle queue
 #
   move-series: # task
-    priority: 41
+    priority: 120
     template:
       - disable-seen-retry
       - series-metainfo
@@ -568,7 +583,7 @@ tasks:
 ##### Move movies from downloads folder to the movies folder, along with possible subtitles and adding the files to the subtitle queue
 #
   move-movies: # task
-    priority: 43
+    priority: 130
     template:
       - disable-seen-retry
       - movies-metainfo
@@ -619,7 +634,7 @@ tasks:
 ##### Download subtitles for the previously queued files
 #
   download-subtitles: # task
-    priority: 45
+    priority: 140
     template:
       - disable-seen-retry
     subtitle_list:
@@ -644,7 +659,7 @@ tasks:
 ##### Clean finished torrents from transmission
 #
   clean-transmission: # task
-    priority: 47
+    priority: 150
     disable: details
     clean_transmission:
       <<: *transmission-settings
@@ -656,7 +671,7 @@ tasks:
 ##### Update trakt series list from local series folders, excluding the ones that already ended
 #
   update-series-list: # task
-    priority: 51
+    priority: 160
     template:
       - disable-seen-retry
       - series-metainfo
@@ -681,7 +696,7 @@ tasks:
 ##### Clean the series that already ended from trakt series list
 #
   clean-series-list: # task
-    priority: 53
+    priority: 170
     delay: 8 day
     template:
       - disable-seen-retry
@@ -703,6 +718,7 @@ tasks:
 
 ##### Sync the seen episodes in the db with trakt series list
   seed-series-db-once: # task
+    priority: 180
     manual: yes
     disable: [seen]
     accept_all: yes
@@ -717,6 +733,7 @@ tasks:
 
 ####################### MISC #########################
   letterboxd-to-trakt: # task
+    priority: 190
     disable: seen
 
 #    template:
@@ -735,7 +752,7 @@ tasks:
 
 
   copy-log-files: # task
-    priority: 100
+    priority: 200
     exec:
       on_exit:
         phase: /home/fmf/.flexget/copy-log.sh
