@@ -474,6 +474,7 @@ tasks:
       from:
         - yts: yes
         - search_rss: https://torrentgalaxy.org/rss.php?cat=42
+        - search_rss: https://www.torrentfunk.com/movies/rss.xml
         - piratebay:
             category: movies
         - limetorrents:
