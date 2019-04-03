@@ -42,7 +42,7 @@ templates:
         timeframe: 16 hours
         #target: hdtv+ 720p
         #quality: webrip 720p
-#        quality: webrip+
+        #quality: webrip+
         propers: 16 hours
         specials: no
         season_packs: always
@@ -661,10 +661,16 @@ tasks:
 #
   clean-transmission: # task
     priority: 150
-    disable: details
-    clean_transmission:
+    from_transmission:
       <<: *transmission-settings
-      finished_for: 1 day
+    disable: [seen, seen_info_hash]
+    if:
+      - transmission_progress == 100: accept
+      - not transmission_seed_ratio_ok: reject
+      - not transmission_idle_limit_ok: reject
+    transmission:
+      <<: *transmission-settings
+      action: remove
 
 
 ########## UPDATES ##########
