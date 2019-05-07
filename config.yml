@@ -48,9 +48,9 @@ templates:
         season_packs: always
     content_size:
       min: 150
-    content_filter:
-      require:
-        - '*.mkv'
+#    content_filter:
+#      require:
+#        - '*.mkv'
 
 ##### Movies config
 #
@@ -268,7 +268,7 @@ tasks:
       path: "/{? folder.root ?}{? folder.series ?}"
       recursive: yes
       retrieve: files
-      regexp: '.*\.(avi|mkv|mp4|m4v)$'
+      regexp: '.*\.(avi|mkv|mp4|m4v|ts)$'
     accept_all: yes
     configure_series:
       from:
@@ -384,7 +384,7 @@ tasks:
       path: "/{? folder.root ?}{? folder.movies ?}"
       recursive: yes
       retrieve: files
-      regexp: '.*\.(avi|mkv|mp4|m4v)$'
+      regexp: '.*\.(avi|mkv|mp4|m4v|ts)$'
     accept_all: yes
     list_remove:
       - movie_list: trakt-movies
@@ -547,7 +547,7 @@ tasks:
         - "/{? folder.root ?}{? folder.downseriesmanual ?}"
       recursive: yes
       retrieve: files
-      regexp: '.*\.(avi|mkv|mp4|m4v)$'
+      regexp: '.*\.(avi|mkv|mp4|m4v|ts)$'
     accept_all: yes
     move:
       to: "/{? folder.root ?}{? folder.series ?}{{tvdb_series_name|default(series_name)|pathscrub}}/S{{tvdb_season|pad(2)|default(series_season|pad(2))}}/"
@@ -595,7 +595,7 @@ tasks:
         - "/{? folder.root ?}{? folder.downmoviesmanual ?}"
       recursive: yes
       retrieve: files
-      regexp: '.*\.(avi|mkv|mp4|m4v)$'
+      regexp: '.*\.(avi|mkv|mp4|m4v|ts)$'
     accept_all: yes
     regexp:
       reject:
