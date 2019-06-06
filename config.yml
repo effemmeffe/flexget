@@ -112,6 +112,8 @@ templates:
         - \bger(man)?\b
         - \bcastellano\b
         - \brus(sian)?\b
+        - \bh265\b
+        - \b10bit\b
     content_filter:
       reject:
         - '*.rar'
