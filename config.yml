@@ -340,7 +340,7 @@ tasks:
     if:
       - trakt_watched: reject
     inputs:
-      - rss: https://torrentgalaxy.org/rss.php?cat=41
+      - rss: https://torrentgalaxy.to/rss.php?cat=41
 
 
 ##### Discover and download older episodes and pilots from recently added series
@@ -370,7 +370,7 @@ tasks:
             from_start: yes
             #backfill: yes
       from:
-        - search_rss: https://torrentgalaxy.org/rss.php?cat=41
+        - search_rss: https://torrentgalaxy.to/rss.php?cat=41
 
 
 ########## MOVIES ##########
@@ -474,13 +474,13 @@ tasks:
       what:
         - movie_list: trakt-movies
       from:
-        - yts: yes
-        - search_rss: https://torrentgalaxy.org/rss.php?cat=42
-        - search_rss: https://www.torrentfunk.com/movies/rss.xml
-        - piratebay:
-            category: movies
-        - limetorrents:
-            category: movies
+#        - yts: yes
+        - search_rss: https://torrentgalaxy.to/rss.php?cat=42
+#        - search_rss: https://www.torrentfunk.com/movies/rss.xml
+#        - piratebay:
+#            category: movies
+#        - limetorrents:
+#            category: movies
 
     list_match:
       from:
