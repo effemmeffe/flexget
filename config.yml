@@ -1,24 +1,23 @@
 variables: my_secrets.yml
 
+#schedules:
+#  - tasks: ['*']
+#    schedule:
+#      hour: "*/4"
+
 schedules:
-        #  - tasks: ['populate-*', 'clean-*', 'update-*']
-        #    schedule:
-        #      hour: "*/3"
-        #  - tasks: ['fill-*', '*-rss']
-        #    schedule:
-        #      hour: "*/3"
-        #  - tasks: ['*-discover', '*-manual']
-        #    schedule:
-        #      hour: "*/3"
-        #  - tasks: ['move-*', '*-subtitles']
-        #    schedule:
-        #      hour: "*/3"
-  - tasks: ['*']
+  - tasks: ['populate-*', 'clean-*', 'update-*']
     schedule:
-      hour: "*/4"
-#      minute: "*/15"
-
-
+      hour: 0
+  - tasks: ['*-rss']
+    schedule:
+      minute: 0,30
+  - tasks: ['*-nextep','fill-*','*-discover', '*-manual']
+    schedule:
+      hour: '*/2'
+  - tasks: ['move-*', download-subtitles]
+    schedule:
+      minute: 15,45
 
 web_server:
   bind: 0.0.0.0
@@ -283,6 +282,38 @@ tasks:
       on_start:
         phase: echo "Started"
 
+##### Fetches the next unwatched episode from the series watchlist and adds it to a custom entry list
+#
+  get-series-nextep:
+    priority: 2
+    template:
+      - disable-seen-retry
+      - series-metainfo
+    list_clear:
+      what:
+        - entry_list: trakt-series-begin
+    next_trakt_episodes:
+      account: "{? trakt.account ?}"
+      list: "{? trakt.series ?}"
+      context: watched
+      position: next
+    accept_all: yes
+    list_add:
+      - entry_list: trakt-series-begin
+
+##### Formats the output of the previous task to tvdb format and sets the begin episode for the series
+#
+  set-series-nextep:
+    priority: 3
+    template:
+      - disable-seen-retry
+      - series-metainfo
+    entry_list: trakt-series-begin
+    accept_all: yes
+    set:
+      series_name: "{{tvdb_series_name|escape|replace('&#39;', '')}}"
+    set_series_begin: yes
+
 ##### Fetch, format and output trakt series list to a custom entry list
 #
   fill-series-list: # task
@@ -340,7 +371,38 @@ tasks:
     if:
       - trakt_watched: reject
     inputs:
-      - rss: https://torrentgalaxy.to/rss.php?cat=41
+#      - rss: https://torrentgalaxy.to/rss.php?cat=41
+      - rss: https://eztv.ag/ezrss.xml
+      - rss: https://www.limetorrents.cc/rss/20/
+
+
+##### Discover and download season packs
+#
+  download-seasons-discover:
+    priority: 8
+    template:
+      - series
+      - reject
+      - torrents
+      - transmission-series
+      - pushbullet
+    #thetvdb does not support season lookups yet
+    thetvdb_lookup: no
+    magnets: yes
+    convert_magnet:
+      timeout: 10 seconds
+      force: yes
+    discover:
+      release_estimations: strict
+      interval: 15 minutes
+      what:
+        - next_series_seasons:
+            from_start: yes
+      from:
+        - piratebay:
+            category: highres tv
+        - limetorrents:
+            category: tv
 
 
 ##### Discover and download older episodes and pilots from recently added series
@@ -370,7 +432,9 @@ tasks:
             from_start: yes
             #backfill: yes
       from:
-        - search_rss: https://torrentgalaxy.to/rss.php?cat=41
+#        - search_rss: https://torrentgalaxy.to/rss.php?cat=41
+        - search_rss: https://eztv.ag/ezrss.xml
+        - search_rss: https://www.limetorrents.cc/rss/20/
 
 
 ########## MOVIES ##########
@@ -475,12 +539,12 @@ tasks:
         - movie_list: trakt-movies
       from:
 #        - yts: yes
-        - search_rss: https://torrentgalaxy.to/rss.php?cat=42
+#        - search_rss: https://torrentgalaxy.to/rss.php?cat=42
 #        - search_rss: https://www.torrentfunk.com/movies/rss.xml
-#        - piratebay:
-#            category: movies
-#        - limetorrents:
-#            category: movies
+        - piratebay:
+            category: highres movies
+        - limetorrents:
+            category: movies
 
     list_match:
       from:
@@ -519,6 +583,10 @@ tasks:
       from:
         - yts: yes
 #        - search_rss: https://torrentgalaxy.org/rss.php?cat=1
+        - piratebay:
+            category: highres movies
+        - limetorrents:
+            category: movies
 
 
 #    if:
