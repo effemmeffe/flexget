@@ -15,7 +15,7 @@ schedules:
   - tasks: ['*-nextep','fill-*','*-discover', '*-manual']
     schedule:
       hour: '*/2'
-  - tasks: ['move-*', download-subtitles]
+  - tasks: ['move-*', download-subtitles, copy-log-files]
     schedule:
       minute: 15,45
 
@@ -46,7 +46,7 @@ templates:
         specials: no
         season_packs: always
     content_size:
-      min: 150
+      min: 100
 #    content_filter:
 #      require:
 #        - '*.mkv'
@@ -62,7 +62,7 @@ templates:
     movie_list: trakt-movies
     quality: 1080p webdl
     content_size:
-      min: 800
+      min: 500
       max: 9000
 
   movies-720p:
@@ -84,7 +84,7 @@ templates:
       username: "{? trakt.user ?}"
     movie_list: trakt-movies
     content_size:
-      min: 800
+      min: 500
       max: 9000
 
 ##### Transmission config
@@ -231,6 +231,8 @@ templates:
     metainfo_series: yes
     thetvdb_lookup: yes
 #    tvmaze_lookup: yes
+    trakt_lookup: yes
+
 
 ##### Guessit parsing for some series tasks, not applied to all tasks because it causes issues with "name (year)" based series, like scandal
 #
@@ -284,7 +286,7 @@ tasks:
 
 ##### Fetches the next unwatched episode from the series watchlist and adds it to a custom entry list
 #
-  get-series-nextep:
+  get-series-nextep: # task
     priority: 2
     template:
       - disable-seen-retry
@@ -303,7 +305,7 @@ tasks:
 
 ##### Formats the output of the previous task to tvdb format and sets the begin episode for the series
 #
-  set-series-nextep:
+  set-series-nextep: # task
     priority: 3
     template:
       - disable-seen-retry
@@ -372,37 +374,38 @@ tasks:
       - trakt_watched: reject
     inputs:
 #      - rss: https://torrentgalaxy.to/rss.php?cat=41
-      - rss: https://eztv.ag/ezrss.xml
+      - rss: https://eztv.io/ezrss.xml
+      - rss: https://eztv.tf/ezrss.xml
       - rss: https://www.limetorrents.cc/rss/20/
 
 
 ##### Discover and download season packs
 #
-  download-seasons-discover:
-    priority: 8
-    template:
-      - series
-      - reject
-      - torrents
-      - transmission-series
-      - pushbullet
-    #thetvdb does not support season lookups yet
-    thetvdb_lookup: no
-    magnets: yes
-    convert_magnet:
-      timeout: 10 seconds
-      force: yes
-    discover:
-      release_estimations: strict
-      interval: 15 minutes
-      what:
-        - next_series_seasons:
-            from_start: yes
-      from:
-        - piratebay:
-            category: highres tv
-        - limetorrents:
-            category: tv
+#  download-seasons-discover: # task
+#    priority: 8
+#    template:
+#      - series
+#      - reject
+#      - torrents
+#      - transmission-series
+#      - pushbullet
+#    #thetvdb does not support season lookups yet
+#    thetvdb_lookup: no
+#    magnets: yes
+#    convert_magnet:
+#      timeout: 10 seconds
+#      force: yes
+#    discover:
+#      release_estimations: strict
+#      interval: 15 minutes
+#      what:
+#        - next_series_seasons:
+#            from_start: yes
+#      from:
+#        - piratebay:
+#            category: highres tv
+#        - limetorrents:
+#            category: tv
 
 
 ##### Discover and download older episodes and pilots from recently added series
@@ -433,7 +436,8 @@ tasks:
             #backfill: yes
       from:
 #        - search_rss: https://torrentgalaxy.to/rss.php?cat=41
-        - search_rss: https://eztv.ag/ezrss.xml
+        - search_rss: https://eztv.io/ezrss.xml
+        - search_rss: https://eztv.tf/ezrss.xml
         - search_rss: https://www.limetorrents.cc/rss/20/
 
 
@@ -620,9 +624,11 @@ tasks:
       regexp: '.*\.(avi|mkv|mp4|m4v|ts)$'
     accept_all: yes
     move:
-      to: "/{? folder.root ?}{? folder.series ?}{{tvdb_series_name|default(series_name)|pathscrub}}/S{{tvdb_season|pad(2)|default(series_season|pad(2))}}/"
-      rename: "{{tvdb_series_name|default(series_name)|pathscrub}} - {{tvdb_ep_id|default(series_id)}}{% if tvdb_ep_name|default(False) %} - {{tvdb_ep_name|pathscrub}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
 
+#      to: "/{? folder.root ?}{? folder.series ?}{{tvdb_series_name|default(series_name)|pathscrub}}/S{{tvdb_season|pad(2)|default(series_season|pad(2))}}/"
+      to: "/{? folder.root ?}{? folder.series ?}{{series_name|pathscrub}}/S{{series_season|pad(2)}}/"
+      rename: "{{series_name|pathscrub}} - {{tvdb_ep_id}}{% if tvdb_ep_name|default(False) %} - {{tvdb_ep_name|pathscrub}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
+      #rename: "{{tvdb_series_name|default(series_name)|pathscrub}} - {{tvdb_ep_id|default(series_id)}}{% if tvdb_ep_name|default(False) %} - {{tvdb_ep_name|pathscrub}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
       along:
         extensions:
           - srt
@@ -809,7 +815,7 @@ tasks:
 
 
 ####################### MISC #########################
-  letterboxd-to-trakt: # task
+  letterboxd-lsm: # task
     priority: 190
     disable: seen
 
@@ -826,6 +832,25 @@ tasks:
           account: "{? trakt.account ?}"
           username: "{? trakt.user ?}"
           list: love-smile-cry
+
+
+  letterboxd-mcu: # task
+    priority: 190
+    disable: seen
+
+#    template:
+#      - disable-seen-retry
+    letterboxd:
+      username: "{? letterboxd.user ?}"
+      list: mcu
+    sort_by: added
+    #    max_results: 20  # <--- Set depending on how often you run the task; high enough that it will catch all new entries,
+    accept_all: yes    #      but low enough so as not to parse (much) more of the list than is necessary.
+    list_add:
+      - trakt_list:
+          account: "{? trakt.account ?}"
+          username: "{? trakt.user ?}"
+          list: mcu
 
 
   copy-log-files: # task
