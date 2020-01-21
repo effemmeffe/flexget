@@ -31,7 +31,10 @@ templates:
   series:
     metainfo_series: yes
     thetvdb_lookup: yes
-#    tvmaze_lookup: yes
+    trakt_lookup:
+      account: "{? trakt.accout ?}"
+      username: "{? trakt.user ?}"
+    tvmaze_lookup: yes
     include: series.yml
     configure_series:
       from:
@@ -182,8 +185,8 @@ templates:
       main_file_only: yes
       include_subs: yes
       rename_like_files: yes
-      content_filename: "{{tvdb_series_name|default(series_name)|pathscrub}} - {{tvdb_ep_id|default(series_id)}}{% if tvdb_ep_name|default(False) %} - {{tvdb_ep_name|pathscrub}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
-      path: "/{? folder.root ?}{? folder.downseries ?}{{tvdb_series_name|default(series_name)|pathscrub}}/"
+      content_filename: "{{trakt_series_name|default(series_name)|pathscrub}} - {{trakt_ep_id|default(series_id)}}{% if trakt_ep_name|default(False) %} - {{trakt_ep_name|pathscrub}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
+      path: "/{? folder.root ?}{? folder.downseries ?}{{trakt_series_name|default(series_name)|pathscrub}}/"
 
 ##### Transmission movies config
 #
@@ -230,8 +233,11 @@ templates:
   series-metainfo:
     metainfo_series: yes
     thetvdb_lookup: yes
-#    tvmaze_lookup: yes
-    trakt_lookup: yes
+    tvmaze_lookup: yes
+    trakt_lookup:
+      account: "{? trakt.accout ?}"
+      username: "{? trakt.user ?}"
+
 
 
 ##### Guessit parsing for some series tasks, not applied to all tasks because it causes issues with "name (year)" based series, like scandal
@@ -303,7 +309,7 @@ tasks:
     list_add:
       - entry_list: trakt-series-begin
 
-##### Formats the output of the previous task to tvdb format and sets the begin episode for the series
+##### Formats the output of the previous task to trakt format and sets the begin episode for the series
 #
   set-series-nextep: # task
     priority: 3
@@ -313,7 +319,7 @@ tasks:
     entry_list: trakt-series-begin
     accept_all: yes
     set:
-      series_name: "{{tvdb_series_name|escape|replace('&#39;', '')}}"
+      series_name: "{{trakt_series_name|escape|replace('&#39;', '')}}"
     set_series_begin: yes
 
 ##### Fetch, format and output trakt series list to a custom entry list
@@ -332,7 +338,7 @@ tasks:
       type: shows
     accept_all: yes
     set:
-      title: "{{tvdb_series_name|default(series_name)}}"
+      title: "{{trakt_series_name|default(series_name)}}"
     list_add:
       - entry_list: trakt-series
 
@@ -346,7 +352,7 @@ tasks:
       - series-metainfo
       - series-guessit
       - transmission-series
-      - pushbullet
+#      - pushbullet
     filesystem:
       path: "/{? folder.watchseries ?}"
       mask: '*.torrent'
@@ -486,7 +492,7 @@ tasks:
       - disable-seen-retry
       - movies-metainfo
       - transmission-movies
-      - pushbullet
+#      - pushbullet
     filesystem:
       path: "/{? folder.watchmovies ?}"
       mask: '*.torrent'
@@ -625,10 +631,8 @@ tasks:
     accept_all: yes
     move:
 
-#      to: "/{? folder.root ?}{? folder.series ?}{{tvdb_series_name|default(series_name)|pathscrub}}/S{{tvdb_season|pad(2)|default(series_season|pad(2))}}/"
       to: "/{? folder.root ?}{? folder.series ?}{{series_name|pathscrub}}/S{{series_season|pad(2)}}/"
-      rename: "{{series_name|pathscrub}} - {{tvdb_ep_id|defaut({id})}}{% if tvdb_ep_name|default(False) %} - {{tvdb_ep_name|pathscrub}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
-      #rename: "{{tvdb_series_name|default(series_name)|pathscrub}} - {{tvdb_ep_id|default(series_id)}}{% if tvdb_ep_name|default(False) %} - {{tvdb_ep_name|pathscrub}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
+      rename: "{{trakt_series_name|pathscrub}} - {{trakt_ep_id}}{% if trakt_ep_name|default(False) %} - {{trakt_ep_name|pathscrub}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
       along:
         extensions:
           - srt
@@ -768,7 +772,7 @@ tasks:
             format: ' S01E01'
     accept_all: yes
     if:
-      - tvdb_status == 'Ended': reject
+      - trakt_series_status == 'Ended': reject
     list_add:
       - trakt_list:
           account: "{? trakt.account ?}"
@@ -790,7 +794,7 @@ tasks:
       list: "{? trakt.series ?}"
       type: shows
     if:
-      - tvdb_status == 'Ended': accept
+      - trakt_series_status == 'Ended': accept
     list_remove:
       - trakt_list:
           account: "{? trakt.account ?}"
