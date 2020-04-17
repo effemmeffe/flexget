@@ -32,10 +32,10 @@ templates:
     metainfo_series: yes
     thetvdb_lookup: yes
     trakt_lookup:
-      account: "{? trakt.accout ?}"
+      account: "{? trakt.account ?}"
       username: "{? trakt.user ?}"
     tvmaze_lookup: yes
-    include: series.yml
+#    include: series.yml
     configure_series:
       from:
         entry_list: trakt-series
@@ -60,7 +60,7 @@ templates:
     metainfo_movie: yes
 #    tmdb_lookup: yes
     trakt_lookup:
-      account: "{? trakt.accout ?}"
+      account: "{? trakt.account ?}"
       username: "{? trakt.user ?}"
     movie_list: trakt-movies
     quality: 1080p webdl
@@ -72,7 +72,7 @@ templates:
     metainfo_movie: yes
 #    tmdb_lookup: yes
     trakt_lookup:
-      account: "{? trakt.accout ?}"
+      account: "{? trakt.account ?}"
       username: "{? trakt.user ?}"
     movie_list: trakt-movies
     quality: 720p webdl
@@ -83,7 +83,7 @@ templates:
   movies-noquality:
     metainfo_movie: yes
     trakt_lookup:
-      account: "{? trakt.accout ?}"
+      account: "{? trakt.account ?}"
       username: "{? trakt.user ?}"
     movie_list: trakt-movies
     content_size:
@@ -233,10 +233,10 @@ templates:
   series-metainfo:
     metainfo_series: yes
     thetvdb_lookup: yes
-    tvmaze_lookup: yes
-    trakt_lookup:
-      account: "{? trakt.accout ?}"
-      username: "{? trakt.user ?}"
+#    tvmaze_lookup: yes
+#    trakt_lookup:
+#      account: "{? trakt.account ?}"
+#      username: "{? trakt.user ?}"
 
 
 
@@ -252,7 +252,7 @@ templates:
     metainfo_movie: yes
 #    tmdb_lookup: yes
     trakt_lookup:
-      account: "{? trakt.accout ?}"
+      account: "{? trakt.account ?}"
       username: "{? trakt.user ?}"
     parsing:
       movie: guessit
@@ -319,7 +319,8 @@ tasks:
     entry_list: trakt-series-begin
     accept_all: yes
     set:
-      series_name: "{{trakt_series_name|escape|replace('&#39;', '')}}"
+#      series_name: "{{trakt_series_name|escape|replace('&#39;', '')}}"
+      series_name: "{{tvdb_series_name|escape|replace('&#39;', '')}}"
     set_series_begin: yes
 
 ##### Fetch, format and output trakt series list to a custom entry list
@@ -338,7 +339,8 @@ tasks:
       type: shows
     accept_all: yes
     set:
-      title: "{{trakt_series_name|default(series_name)}}"
+#      title: "{{trakt_series_name|default(series_name)}}"
+      title: "{{tvdb_series_name|default(series_name)}}"
     list_add:
       - entry_list: trakt-series
 
@@ -381,8 +383,10 @@ tasks:
     inputs:
 #      - rss: https://torrentgalaxy.to/rss.php?cat=41
       - rss: https://eztv.io/ezrss.xml
-      - rss: https://eztv.tf/ezrss.xml
-      - rss: https://www.limetorrents.cc/rss/20/
+#      - rss: https://eztv.tf/ezrss.xml
+#      - rss: https://www.limetorrents.cc/rss/20/
+      - rss: http://showrss.info/user/48286.rss?magnets=true&namespaces=true&name=null&quality=null&re=null
+      - rss: https://rarbg.to/rssdd.php?category=41  # x264/720p/1080p
 
 
 ##### Discover and download season packs
@@ -443,8 +447,10 @@ tasks:
       from:
 #        - search_rss: https://torrentgalaxy.to/rss.php?cat=41
         - search_rss: https://eztv.io/ezrss.xml
-        - search_rss: https://eztv.tf/ezrss.xml
-        - search_rss: https://www.limetorrents.cc/rss/20/
+#        - search_rss: https://eztv.tf/ezrss.xml
+#        - search_rss: https://www.limetorrents.cc/rss/20/
+        - search_rss: http://showrss.info/user/48286.rss?magnets=true&namespaces=true&name=null&quality=null&re=null
+        - search_rss: https://rarbg.to/rssdd.php?category=41  # x264/720p/1080p
 
 
 ########## MOVIES ##########
@@ -517,11 +523,14 @@ tasks:
       - reject
       - torrents
       - transmission-movies
+    if:
+      - trakt_watched: reject
     inputs:
       - rss: { url: 'https://thepiratebay.org/rss/top100/201', silent: yes }
       #- rss: { url: 'http://extratorrent.cc/rss.xml?cid=4', silent: yes }
       #- rss: { url: 'http://www.torlock.com/movies/rss.xml', silent: yes }
-
+      - rss: { url: 'https://rarbg.to/rssdd.php?category=44', silent: yes }  # x264/720p
+      - rss: { url: 'https://rarbg.to/rssdd.php?category=45', silent: yes }  # x264/1080p
     seen: local
 
 ##### Discover and download 1080p movies
@@ -542,6 +551,8 @@ tasks:
     convert_magnet:
       timeout: 10 seconds
       force: yes
+    if:
+      - trakt_watched: reject
     discover:
       release_estimations: ignore
       interval: 15 minutes
@@ -551,10 +562,11 @@ tasks:
 #        - yts: yes
 #        - search_rss: https://torrentgalaxy.to/rss.php?cat=42
 #        - search_rss: https://www.torrentfunk.com/movies/rss.xml
+        - search_rss: https://rarbg.to/rssdd.php?category=44
         - piratebay:
             category: highres movies
-        - limetorrents:
-            category: movies
+#        - limetorrents:
+#            category: movies
 
     list_match:
       from:
@@ -585,6 +597,8 @@ tasks:
     convert_magnet:
       timeout: 10 seconds
       force: yes
+    if:
+      - trakt_watched: reject
     discover:
       release_estimations: ignore
       interval: 15 minutes
@@ -593,10 +607,11 @@ tasks:
       from:
         - yts: yes
 #        - search_rss: https://torrentgalaxy.org/rss.php?cat=1
+        - search_rss: https://rarbg.to/rssdd.php?category=45
         - piratebay:
             category: highres movies
-        - limetorrents:
-            category: movies
+#        - limetorrents:
+#            category: movies
 
 
 #    if:
@@ -630,9 +645,8 @@ tasks:
       regexp: '.*\.(avi|mkv|mp4|m4v|ts)$'
     accept_all: yes
     move:
-
-      to: "/{? folder.root ?}{? folder.series ?}{{series_name|pathscrub}}/S{{series_season|pad(2)}}/"
-      rename: "{{trakt_series_name|pathscrub}} - {{trakt_ep_id}}{% if trakt_ep_name|default(False) %} - {{trakt_ep_name|pathscrub}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
+      to: "/{? folder.root ?}{? folder.series ?}{{tvdb_series_name|pathscrub}}/S{{tvdb_season|pad(2)}}/"
+      rename: "{{tvdb_series_name|pathscrub}} - {{tvdb_ep_id}}{% if tvdb_ep_name|default(False) %} - {{tvdb_ep_name|pathscrub}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
       along:
         extensions:
           - srt
@@ -684,8 +698,6 @@ tasks:
         - .*(rarbg|RARBG).mp4
         - .*(rarbg|RARBG).(com|COM)
     move:
-#      to: "/{? folder.root ?}{? folder.movies ?}{{tmdb_name|default(movie_name)|pathscrub}} ({{tmdb_year|default(movie_year)}})"
-#      rename: "{{tmdb_name|default(movie_name)|pathscrub}} ({{tmdb_year|default(movie_year)}}){% if quality|default(False) %} - [{{quality}}]{% endif %}"
       to: "/{? folder.root ?}{? folder.movies ?}{{trakt_movie_name|default(movie_name)|pathscrub}} ({{trakt_movie_year|default(movie_year)}})"
       rename: "{{trakt_movie_name|default(movie_name)|pathscrub}} ({{trakt_movie_year|default(movie_year)}}){% if quality|default(False) %} - [{{quality}}]{% endif %}"
       along:
