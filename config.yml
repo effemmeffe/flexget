@@ -382,7 +382,8 @@ tasks:
       - trakt_watched: reject
     inputs:
 #      - rss: https://torrentgalaxy.to/rss.php?cat=41
-      - rss: https://eztv.io/ezrss.xml
+#      - rss: https://eztv.io/ezrss.xml
+      - rss: https://eztv.re/ezrss.xml
 #      - rss: https://eztv.tf/ezrss.xml
 #      - rss: https://www.limetorrents.cc/rss/20/
       - rss: http://showrss.info/user/48286.rss?magnets=true&namespaces=true&name=null&quality=null&re=null
@@ -446,7 +447,8 @@ tasks:
             #backfill: yes
       from:
 #        - search_rss: https://torrentgalaxy.to/rss.php?cat=41
-        - search_rss: https://eztv.io/ezrss.xml
+#        - search_rss: https://eztv.io/ezrss.xml
+        - search_rss: https://eztv.re/ezrss.xml
 #        - search_rss: https://eztv.tf/ezrss.xml
 #        - search_rss: https://www.limetorrents.cc/rss/20/
         - search_rss: http://showrss.info/user/48286.rss?magnets=true&namespaces=true&name=null&quality=null&re=null
