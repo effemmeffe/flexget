@@ -386,7 +386,7 @@ tasks:
       - rss: https://eztv.re/ezrss.xml
 #      - rss: https://eztv.tf/ezrss.xml
 #      - rss: https://www.limetorrents.cc/rss/20/
-      - rss: http://showrss.info/user/48286.rss?magnets=true&namespaces=true&name=null&quality=null&re=null
+#      - rss: http://showrss.info/user/48286.rss?magnets=true&namespaces=true&name=null&quality=null&re=null
       - rss: https://rarbg.to/rssdd.php?category=41  # x264/720p/1080p
 
 
@@ -451,7 +451,7 @@ tasks:
         - search_rss: https://eztv.re/ezrss.xml
 #        - search_rss: https://eztv.tf/ezrss.xml
 #        - search_rss: https://www.limetorrents.cc/rss/20/
-        - search_rss: http://showrss.info/user/48286.rss?magnets=true&namespaces=true&name=null&quality=null&re=null
+#        - search_rss: http://showrss.info/user/48286.rss?magnets=true&namespaces=true&name=null&quality=null&re=null
         - search_rss: https://rarbg.to/rssdd.php?category=41  # x264/720p/1080p
 
 
@@ -528,7 +528,7 @@ tasks:
     if:
       - trakt_watched: reject
     inputs:
-      - rss: { url: 'https://thepiratebay.org/rss/top100/201', silent: yes }
+      #- rss: { url: 'https://thepiratebay.org/rss/top100/201', silent: yes }
       #- rss: { url: 'http://extratorrent.cc/rss.xml?cid=4', silent: yes }
       #- rss: { url: 'http://www.torlock.com/movies/rss.xml', silent: yes }
       - rss: { url: 'https://rarbg.to/rssdd.php?category=44', silent: yes }  # x264/720p
