@@ -11,13 +11,13 @@ schedules:
       hour: 0
   - tasks: ['*-rss']
     schedule:
-      minute: 0,30
+      hour: 0
   - tasks: ['*-nextep','fill-*','*-discover', '*-manual']
     schedule:
-      hour: '*/2'
+      hour: 0
   - tasks: ['move-*', download-subtitles, copy-log-files]
     schedule:
-      minute: 15,45
+      hour: 0
 
 web_server:
   bind: 0.0.0.0
@@ -383,6 +383,7 @@ tasks:
     inputs:
 #      - rss: https://torrentgalaxy.to/rss.php?cat=41
 #      - rss: https://eztv.io/ezrss.xml
+      - rss: http://showrss.info/user/74772.rss?magnets=true&namespaces=true&name=null&quality=anyhd&re=null
       - rss: https://eztv.re/ezrss.xml
 #      - rss: https://eztv.tf/ezrss.xml
 #      - rss: https://www.limetorrents.cc/rss/20/
