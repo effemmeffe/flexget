@@ -7,17 +7,20 @@ variables: my_secrets.yml
 
 schedules:
   - tasks: ['populate-*', 'clean-*', 'update-*']
-    schedule:
-      hour: 0
+    interval:
+      hours: 3
   - tasks: ['*-rss']
-    schedule:
-      hour: 0
-  - tasks: ['*-nextep','fill-*','*-discover', '*-manual']
-    schedule:
-      hour: 0
+    interval:
+      hours: 3
+  - tasks: ['*-nextep','fill-*','*-discover']
+    interval:
+      hours: 3
   - tasks: ['move-*', download-subtitles, copy-log-files]
-    schedule:
-      hour: 0
+    interval:
+      hours: 3
+  - tasks: ['*manual*']
+    interval:
+      hours: 12
 
 web_server:
   bind: 0.0.0.0
@@ -443,8 +446,8 @@ tasks:
       release_estimations: ignore
       interval: 15 minutes
       what:
-        - next_series_episodes:
-            from_start: yes
+        - next_series_episodes: yes
+            #from_start: yes
             #backfill: yes
       from:
 #        - search_rss: https://torrentgalaxy.to/rss.php?cat=41
@@ -853,8 +856,24 @@ tasks:
           list: love-smile-cry
 
 
+  letterboxd-comedy: # task
+    priority: 191
+    disable: seen
+
+    letterboxd:
+      username: "{? letterboxd.user ?}"
+      list: netflix-stand-up-comedy
+    sort_by: added
+    accept_all: yes
+    list_add:
+      - trakt_list:
+          account: "{? trakt.account ?}"
+          username: "{? trakt.user ?}"
+          list: netflix-stand-up-comedy
+
+
   letterboxd-mcu: # task
-    priority: 190
+    priority: 192
     disable: seen
 
 #    template:
