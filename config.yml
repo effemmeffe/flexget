@@ -442,21 +442,26 @@ tasks:
     convert_magnet:
       timeout: 10 seconds
       force: yes
-    discover:
-      release_estimations: ignore
-      interval: 15 minutes
-      what:
-        - next_series_episodes: yes
-            #from_start: yes
-            #backfill: yes
-      from:
-#        - search_rss: https://torrentgalaxy.to/rss.php?cat=41
-#        - search_rss: https://eztv.io/ezrss.xml
-        - search_rss: https://eztv.re/ezrss.xml
-#        - search_rss: https://eztv.tf/ezrss.xml
-#        - search_rss: https://www.limetorrents.cc/rss/20/
-#        - search_rss: http://showrss.info/user/48286.rss?magnets=true&namespaces=true&name=null&quality=null&re=null
-        - search_rss: https://rarbg.to/rssdd.php?category=41  # x264/720p/1080p
+      
+    inputs:
+      - rss: https://eztv.re/ezrss.xml
+      - rss: https://rarbg.to/rssdd.php?category=41  # x264/720p/1080p
+
+#    discover:
+#      release_estimations: ignore
+#      interval: 15 minutes
+#      what:
+#        - next_series_episodes: yes
+#            #from_start: yes
+#            #backfill: yes
+#      from:
+##        - search_rss: https://torrentgalaxy.to/rss.php?cat=41
+##        - search_rss: https://eztv.io/ezrss.xml
+#        - search_rss: https://eztv.re/ezrss.xml
+##        - search_rss: https://eztv.tf/ezrss.xml
+##        - search_rss: https://www.limetorrents.cc/rss/20/
+##        - search_rss: http://showrss.info/user/48286.rss?magnets=true&namespaces=true&name=null&quality=null&re=null
+#        - search_rss: https://rarbg.to/rssdd.php?category=41  # x264/720p/1080p
 
 
 ########## MOVIES ##########
@@ -559,20 +564,23 @@ tasks:
       force: yes
     if:
       - trakt_watched: reject
-    discover:
-      release_estimations: ignore
-      interval: 15 minutes
-      what:
-        - movie_list: trakt-movies
-      from:
-#        - yts: yes
-#        - search_rss: https://torrentgalaxy.to/rss.php?cat=42
-#        - search_rss: https://www.torrentfunk.com/movies/rss.xml
-        - search_rss: https://rarbg.to/rssdd.php?category=44
-        - piratebay:
-            category: highres movies
-#        - limetorrents:
-#            category: movies
+    inputs:
+      - rss: https://eztv.re/ezrss.xml
+      - rss: https://rarbg.to/rssdd.php?category=44
+#    discover:
+#      release_estimations: ignore
+#      interval: 15 minutes
+#      what:
+#        - movie_list: trakt-movies
+#      from:
+##        - yts: yes
+##        - search_rss: https://torrentgalaxy.to/rss.php?cat=42
+##        - search_rss: https://www.torrentfunk.com/movies/rss.xml
+#        - search_rss: https://rarbg.to/rssdd.php?category=44
+#        - piratebay:
+#            category: highres movies
+##        - limetorrents:
+##            category: movies
 
     list_match:
       from:
@@ -605,19 +613,21 @@ tasks:
       force: yes
     if:
       - trakt_watched: reject
-    discover:
-      release_estimations: ignore
-      interval: 15 minutes
-      what:
-        - movie_list: trakt-movies
-      from:
-        - yts: yes
-#        - search_rss: https://torrentgalaxy.org/rss.php?cat=1
-        - search_rss: https://rarbg.to/rssdd.php?category=45
-        - piratebay:
-            category: highres movies
-#        - limetorrents:
-#            category: movies
+    inputs:
+      - rss: https://rarbg.to/rssdd.php?category=45
+#    discover:
+#      release_estimations: ignore
+#      interval: 15 minutes
+#      what:
+#        - movie_list: trakt-movies
+#      from:
+#        - yts: yes
+##        - search_rss: https://torrentgalaxy.org/rss.php?cat=1
+#        - search_rss: https://rarbg.to/rssdd.php?category=45
+#        - piratebay:
+#            category: highres movies
+##        - limetorrents:
+##            category: movies
 
 
 #    if:
@@ -840,9 +850,8 @@ tasks:
   letterboxd-lsm: # task
     priority: 190
     disable: seen
-
-#    template:
-#      - disable-seen-retry
+    template:
+      - movies-metainfo
     letterboxd:
       username: "{? letterboxd.user ?}"
       list: love-smile-cry
@@ -859,7 +868,8 @@ tasks:
   letterboxd-comedy: # task
     priority: 191
     disable: seen
-
+    template:
+      - movies-metainfo
     letterboxd:
       username: "{? letterboxd.user ?}"
       list: netflix-stand-up-comedy
@@ -875,9 +885,8 @@ tasks:
   letterboxd-mcu: # task
     priority: 192
     disable: seen
-
-#    template:
-#      - disable-seen-retry
+    template:
+      - movies-metainfo
     letterboxd:
       username: "{? letterboxd.user ?}"
       list: mcu
