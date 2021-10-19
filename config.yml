@@ -343,8 +343,8 @@ tasks:
     entry_list: trakt-series-begin
     accept_all: yes
     set:
-#      series_name: "{{trakt_series_name|escape|replace('&#39;', '')}}"
-      series_name: "{{tvdb_series_name|escape|replace('&#39;', '')}}"
+      series_name: "{{trakt_series_name|escape|replace('&#39;', '')}}"
+#      series_name: "{{tvdb_series_name|escape|replace('&#39;', '')}}"
     set_series_begin: yes
 
 ##### Fetch, format and output trakt series list to a custom entry list
@@ -363,8 +363,8 @@ tasks:
       type: shows
     accept_all: yes
     set:
-#      title: "{{trakt_series_name|default(series_name)}}"
-      title: "{{tvdb_series_name|default(series_name)}}"
+      title: "{{trakt_series_name|default(series_name)}}"
+#      title: "{{tvdb_series_name|default(series_name)}}"
     list_add:
       - entry_list: trakt-series
 
