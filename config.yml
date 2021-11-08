@@ -33,7 +33,7 @@ templates:
 #
   series:
     metainfo_series: yes
-    thetvdb_lookup: yes
+#    thetvdb_lookup: yes
     trakt_lookup:
       account: "{? trakt.account ?}"
       username: "{? trakt.user ?}"
@@ -189,7 +189,7 @@ templates:
       include_subs: yes
       rename_like_files: yes
       content_filename: "{{trakt_series_name|default(series_name)|pathscrub}} - {{trakt_ep_id|default(series_id)}}{% if trakt_ep_name|default(False) %} - {{trakt_ep_name|pathscrub}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
-      path: "{? folder.root ?}{? folder.downseries ?}{{trakt_series_name|default(series_name)|pathscrub}}/"
+      path: "{? folder.root ?}{? folder.downseries ?}/{{trakt_series_name|default(series_name)|pathscrub}}/"
 
 ##### Transmission movies config
 #
@@ -200,9 +200,9 @@ templates:
       include_subs: yes
       rename_like_files: yes
 #      content_filename: "{{tmdb_name|default(movie_name)|pathscrub}}{% if movie_year|default(False) %}({tmdb_year|default(movie_year)}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
-#      path: "{? folder.root ?}{? folder.downmovies ?}{{movie_name|pathscrub}}/"
+#      path: "{? folder.root ?}{? folder.downmovies ?}/{{movie_name|pathscrub}}/"
       content_filename: "{{trakt_movie_name|default(movie_name)|pathscrub}}{% if movie_year|default(False) %}({trakt_movie_year|default(movie_year)}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
-      path: "{? folder.root ?}{? folder.downmovies ?}{{movie_name|pathscrub}}/"
+      path: "{? folder.root ?}{? folder.downmovies ?}/{{movie_name|pathscrub}}/"
 
 
 ##### Synology config
@@ -235,11 +235,11 @@ templates:
 #
   series-metainfo:
     metainfo_series: yes
-    thetvdb_lookup: yes
+#    thetvdb_lookup: yes
 #    tvmaze_lookup: yes
-#    trakt_lookup:
-#      account: "{? trakt.account ?}"
-#      username: "{? trakt.user ?}"
+    trakt_lookup:
+      account: "{? trakt.account ?}"
+      username: "{? trakt.user ?}"
 
 
 
@@ -682,8 +682,8 @@ tasks:
       regexp: '.*\.(avi|mkv|mp4|m4v|ts)$'
     accept_all: yes
     move:
-      to: "{? folder.root ?}{? folder.series ?}/{{tvdb_series_name|pathscrub}}/S{{tvdb_season|pad(2)}}"
-      rename: "{{tvdb_series_name|pathscrub}} - {{tvdb_ep_id}}{% if tvdb_ep_name|default(False) %} - {{tvdb_ep_name|pathscrub}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
+      to: "{? folder.root ?}{? folder.series ?}/{{trakt_series_name|pathscrub}}/S{{trakt_season|pad(2)}}"
+      rename: "{{trakt_series_name|pathscrub}} - {{trakt_ep_id}}{% if trakt_ep_name|default(False) %} - {{trakt_ep_name|pathscrub}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
       along:
         extensions:
           - srt
