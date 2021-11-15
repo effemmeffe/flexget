@@ -189,7 +189,7 @@ templates:
       include_subs: yes
       rename_like_files: yes
       content_filename: "{{trakt_series_name|default(series_name)|pathscrub}} - {{trakt_ep_id|default(series_id)}}{% if trakt_ep_name|default(False) %} - {{trakt_ep_name|pathscrub}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
-      path: "{? folder.root ?}{? folder.downseries ?}/{{trakt_series_name|default(series_name)|pathscrub}}/"
+      path: "{? folder.root ?}{? folder.downseries ?}/{{trakt_series_name|default(series_name)|pathscrub}} i{% if trakt_series_year|default(False) %}{{trakt_series_year}}{% endif %}/"
 
 ##### Transmission movies config
 #
@@ -682,7 +682,7 @@ tasks:
       regexp: '.*\.(avi|mkv|mp4|m4v|ts)$'
     accept_all: yes
     move:
-      to: "{? folder.root ?}{? folder.series ?}/{{trakt_series_name|pathscrub}}/S{{trakt_season|pad(2)}}"
+      to: "{? folder.root ?}{? folder.series ?}/{{trakt_series_name|pathscrub}} {% if trakt_series_year|default(False) %}{{trakt_series_year}}{% endif %}/S{{trakt_season|pad(2)}}"
       rename: "{{trakt_series_name|pathscrub}} - {{trakt_ep_id}}{% if trakt_ep_name|default(False) %} - {{trakt_ep_name|pathscrub}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
       along:
         extensions:
