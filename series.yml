@@ -1,3 +1,7 @@
 series:
   - Greys anatomy:
       exact: yes
+
+  - Euphoria:
+      alternate_name:
+        Euphoria (US)

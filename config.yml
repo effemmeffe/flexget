@@ -201,8 +201,8 @@ templates:
       rename_like_files: yes
 #      content_filename: "{{tmdb_name|default(movie_name)|pathscrub}}{% if movie_year|default(False) %}({tmdb_year|default(movie_year)}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
 #      path: "{? folder.root ?}{? folder.downmovies ?}/{{movie_name|pathscrub}}/"
-      content_filename: "{{trakt_movie_name|default(movie_name)|pathscrub}}{% if movie_year|default(False) %}({trakt_movie_year|default(movie_year)}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
-      path: "{? folder.root ?}{? folder.downmovies ?}/{{movie_name|pathscrub}}/"
+      content_filename: "{{trakt_movie_name|pathscrub}}{% if movie_year|default(False) %}({trakt_movie_year|default(movie_year)}}{% endif %}{% if quality|default(False) %} - [{{quality}}]{% endif %}"
+      path: "{? folder.root ?}{? folder.downmovies ?}/{{trakt_movie_name|pathscrub}}/"
 
 
 ##### Synology config
@@ -703,7 +703,7 @@ tasks:
     kodi_library:
       action: scan
       category: video
-      url: http://192.168.254.100
+      url: http://127.0.0.1
       port: 8080
       username: "{? kodi.user ?}"
       password: "{? kodi.password ?}"
@@ -735,8 +735,8 @@ tasks:
         - .*(rarbg|RARBG).mp4
         - .*(rarbg|RARBG).(com|COM)
     move:
-      to: "{? folder.root ?}{? folder.movies ?}/{{trakt_movie_name|default(movie_name)|pathscrub}} ({{trakt_movie_year|default(movie_year)}})"
-      rename: "{{trakt_movie_name|default(movie_name)|pathscrub}} ({{trakt_movie_year|default(movie_year)}}){% if quality|default(False) %} - [{{quality}}]{% endif %}"
+      to: "{? folder.root ?}{? folder.movies ?}/{{trakt_movie_name|pathscrub}} ({{trakt_movie_year|default(movie_year)}})"
+      rename: "{{trakt_movie_name|pathscrub}} ({{trakt_movie_year|default(movie_year)}}){% if quality|default(False) %} - [{{quality}}]{% endif %}"
       along:
         extensions:
           - srt
@@ -752,7 +752,7 @@ tasks:
     kodi_library:
       action: scan
       category: video
-      url: http://192.168.254.100
+      url: http://127.0.0.1
       port: 8080
       username: "{? kodi.user ?}"
       password: "{? kodi.password ?}"
