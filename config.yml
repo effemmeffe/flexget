@@ -12,7 +12,7 @@ schedules:
   - tasks: ['*-rss']
     interval:
       hours: 3
-  - tasks: ['*-nextep','fill-*','*-discover']
+  - tasks: ['*-DISABLEnextep','fill-*','*-discover']
     interval:
       hours: 3
   - tasks: ['move-*', download-subtitles, copy-log-files]
@@ -280,8 +280,8 @@ tasks:
         filesystem:
           path: "{? folder.root ?}{? folder.series ?}"
           retrieve: dirs
-      settings:
-        tracking: no
+#      settings:
+#        tracking: no
     exec:
       on_start:
         phase: echo "Started"
@@ -308,8 +308,8 @@ tasks:
         filesystem:
           path: "{? folder.root ?}{? folder.series ?}"
           retrieve: dirs
-      settings:
-        tracking: no
+#      settings:
+#        tracking: no
     exec:
       on_start:
         phase: echo "Started"
